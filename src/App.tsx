@@ -1,4 +1,11 @@
-import { FormEvent, startTransition, useEffect, useEffectEvent, useMemo, useState } from "react";
+import {
+  FormEvent,
+  startTransition,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+} from "react";
 import { listen } from "@tauri-apps/api/event";
 import {
   deleteManualRule,
@@ -48,9 +55,12 @@ function App() {
   useEffect(() => {
     void refresh();
 
-    const unlisten = listen<AppOverview>("smart-keyword://overview-updated", (event) => {
-      applyOverview(event.payload);
-    });
+    const unlisten = listen<AppOverview>(
+      "smart-keyword://overview-updated",
+      (event) => {
+        applyOverview(event.payload);
+      },
+    );
 
     return () => {
       void unlisten.then((stop) => stop());
@@ -66,7 +76,10 @@ function App() {
   );
 
   async function handleSettingsChange(
-    next: Pick<AppOverview["settings"], "autoSwitchEnabled" | "learningEnabled">,
+    next: Pick<
+      AppOverview["settings"],
+      "autoSwitchEnabled" | "learningEnabled"
+    >,
   ) {
     if (!overview) {
       return;
@@ -197,14 +210,26 @@ function App() {
               <p className="panel-kicker">实时状态</p>
               <h2>当前焦点与决策</h2>
             </div>
-            <button className="ghost-button" type="button" onClick={() => void refresh()}>
+            <button
+              className="ghost-button"
+              type="button"
+              onClick={() => void refresh()}
+            >
               刷新
             </button>
           </div>
 
           <div className="metrics">
-            <MetricCard label="前台应用" value={activeExecutable} detail={overview?.activeApp?.windowTitle} />
-            <MetricCard label="当前输入法" value={currentMode} detail={overview?.activeApp?.processPath ?? "等待检测"} />
+            <MetricCard
+              label="前台应用"
+              value={activeExecutable}
+              detail={overview?.activeApp?.windowTitle}
+            />
+            <MetricCard
+              label="当前输入法"
+              value={currentMode}
+              detail={overview?.activeApp?.processPath ?? "等待检测"}
+            />
             <MetricCard
               label="决策来源"
               value={sourceLabel}
@@ -217,7 +242,9 @@ function App() {
               className="primary-button"
               type="button"
               disabled={!overview?.activeApp}
-              onClick={() => setRuleExecutable(overview?.activeApp?.executable ?? "")}
+              onClick={() =>
+                setRuleExecutable(overview?.activeApp?.executable ?? "")
+              }
             >
               用当前应用填充规则
             </button>
@@ -269,7 +296,8 @@ function App() {
               disabled={!overview || busyAction === "settings"}
               onChange={(event) =>
                 void handleSettingsChange({
-                  autoSwitchEnabled: overview?.settings.autoSwitchEnabled ?? true,
+                  autoSwitchEnabled:
+                    overview?.settings.autoSwitchEnabled ?? true,
                   learningEnabled: event.currentTarget.checked,
                 })
               }
@@ -297,7 +325,9 @@ function App() {
               应用可执行文件
               <input
                 value={ruleExecutable}
-                onChange={(event) => setRuleExecutable(event.currentTarget.value)}
+                onChange={(event) =>
+                  setRuleExecutable(event.currentTarget.value)
+                }
                 placeholder="例如 WeChat.exe / Code.exe"
               />
             </label>
@@ -306,7 +336,9 @@ function App() {
               进入该应用时使用
               <select
                 value={ruleLanguage}
-                onChange={(event) => setRuleLanguage(event.currentTarget.value as LanguageMode)}
+                onChange={(event) =>
+                  setRuleLanguage(event.currentTarget.value as LanguageMode)
+                }
               >
                 {languageOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -325,7 +357,11 @@ function App() {
               />
             </label>
 
-            <button className="primary-button" type="submit" disabled={busyAction === "save-rule"}>
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={busyAction === "save-rule"}
+            >
               保存规则
             </button>
           </form>
@@ -373,8 +409,13 @@ function App() {
                   title={entry.executable}
                   badge={labelForMode(entry.preferredLanguage)}
                   meta={`置信度 ${Math.round(entry.confidence * 100)}% · 中文 ${entry.chineseScore} / 英文 ${entry.englishScore}`}
-                  actionLabel={entry.preferredLanguage ? "设为手动规则" : "继续观察"}
-                  disabled={!entry.preferredLanguage || busyAction === `promote-${entry.executable}`}
+                  actionLabel={
+                    entry.preferredLanguage ? "设为手动规则" : "继续观察"
+                  }
+                  disabled={
+                    !entry.preferredLanguage ||
+                    busyAction === `promote-${entry.executable}`
+                  }
                   onAction={() => void handlePromotePreference(entry)}
                 />
               ))
@@ -392,10 +433,16 @@ function App() {
 
           <div className="timeline">
             {(overview?.recentEvents ?? []).length === 0 ? (
-              <EmptyState title="日志暂时为空" copy="切换几个应用后，这里会显示规则命中、自动调整和学习记录。" />
+              <EmptyState
+                title="日志暂时为空"
+                copy="切换几个应用后，这里会显示规则命中、自动调整和学习记录。"
+              />
             ) : (
               overview?.recentEvents.map((entry) => (
-                <div className="timeline-item" key={`${entry.timestampEpoch}-${entry.app}-${entry.summary}`}>
+                <div
+                  className="timeline-item"
+                  key={`${entry.timestampEpoch}-${entry.app}-${entry.summary}`}
+                >
                   <div className="timeline-dot" />
                   <div>
                     <div className="timeline-head">
@@ -415,7 +462,15 @@ function App() {
   );
 }
 
-function MetricCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
+function MetricCard({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail?: string;
+}) {
   return (
     <div className="metric-card">
       <span>{label}</span>
@@ -466,7 +521,12 @@ function RuleRow({
         </div>
         <p>{meta}</p>
       </div>
-      <button className="ghost-button" type="button" disabled={disabled} onClick={onAction}>
+      <button
+        className="ghost-button"
+        type="button"
+        disabled={disabled}
+        onClick={onAction}
+      >
         {actionLabel}
       </button>
     </div>

@@ -1,7 +1,11 @@
 :root {
   color: #13211c;
   background:
-    radial-gradient(circle at top left, rgba(228, 173, 94, 0.22), transparent 32%),
+    radial-gradient(
+      circle at top left,
+      rgba(228, 173, 94, 0.22),
+      transparent 32%
+    ),
     radial-gradient(circle at right, rgba(58, 130, 92, 0.18), transparent 28%),
     linear-gradient(160deg, #f7f2e8 0%, #eef4ed 55%, #dfe9e1 100%);
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -128,15 +132,27 @@ button {
 }
 
 .status-pill-ok {
-  background: linear-gradient(135deg, rgba(235, 252, 239, 0.92), rgba(248, 255, 243, 0.82));
+  background: linear-gradient(
+    135deg,
+    rgba(235, 252, 239, 0.92),
+    rgba(248, 255, 243, 0.82)
+  );
 }
 
 .status-pill-warn {
-  background: linear-gradient(135deg, rgba(255, 243, 224, 0.92), rgba(255, 251, 243, 0.82));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 243, 224, 0.92),
+    rgba(255, 251, 243, 0.82)
+  );
 }
 
 .status-pill-soft {
-  background: linear-gradient(135deg, rgba(244, 248, 244, 0.92), rgba(255, 252, 247, 0.82));
+  background: linear-gradient(
+    135deg,
+    rgba(244, 248, 244, 0.92),
+    rgba(255, 252, 247, 0.82)
+  );
 }
 
 .banner {
@@ -171,7 +187,11 @@ button {
 
 .panel-spotlight {
   background:
-    linear-gradient(180deg, rgba(255, 248, 240, 0.95), rgba(249, 253, 248, 0.86)),
+    linear-gradient(
+      180deg,
+      rgba(255, 248, 240, 0.95),
+      rgba(249, 253, 248, 0.86)
+    ),
     linear-gradient(120deg, rgba(238, 195, 129, 0.12), transparent 35%);
 }
 

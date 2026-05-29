@@ -288,9 +288,7 @@ impl SmartSwitcherService {
                         format!(
                             "目标为 {}，当前检测结果为 {}。",
                             target.label(),
-                            refreshed_mode
-                                .map(LanguageMode::label)
-                                .unwrap_or("未知")
+                            refreshed_mode.map(LanguageMode::label).unwrap_or("未知")
                         ),
                     );
                 }
@@ -310,7 +308,9 @@ impl SmartSwitcherService {
             initial_mode: current_mode,
             auto_applied_mode,
             latest_observed_mode: self.current_input_mode.or(current_mode),
-            settled_mode: auto_applied_mode.or(self.current_input_mode).or(current_mode),
+            settled_mode: auto_applied_mode
+                .or(self.current_input_mode)
+                .or(current_mode),
             switch_guard_until: guard_until,
         });
         Ok(())
