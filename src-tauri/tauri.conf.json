@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "smart-keyword",
+  "productName": "smart-keyboard",
   "version": "0.1.0",
-  "identifier": "com.coconut-fish.smart-keyword",
+  "identifier": "com.coconut-fish.smart-keyboard",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "smart-keyword",
+        "title": "smart-keyboard",
         "width": 800,
         "height": 600
       }
