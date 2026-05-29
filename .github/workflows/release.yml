@@ -79,7 +79,7 @@ jobs:
                 owner,
                 repo,
                 release_id: existing.data.id,
-                name: `Smart Keyword ${tag}`,
+                name: `Smart Keyboard ${tag}`,
                 draft: false,
                 prerelease,
               });
@@ -96,7 +96,7 @@ jobs:
               owner,
               repo,
               tag_name: tag,
-              name: `Smart Keyword ${tag}`,
+              name: `Smart Keyboard ${tag}`,
               draft: false,
               prerelease,
               generate_release_notes: true,
@@ -158,4 +158,4 @@ jobs:
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           tagName: ${{ needs.create-release.outputs.tag_name }}
-          releaseName: Smart Keyword ${{ needs.create-release.outputs.tag_name }}
+          releaseName: Smart Keyboard ${{ needs.create-release.outputs.tag_name }}

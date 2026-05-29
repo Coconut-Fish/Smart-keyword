@@ -11,7 +11,7 @@ impl Storage {
     pub fn new() -> Result<Self, String> {
         let base_dir = dirs::config_dir()
             .ok_or_else(|| "Unable to resolve the user config directory.".to_string())?
-            .join("smart-keyword");
+            .join("smart-keyboard");
 
         fs::create_dir_all(&base_dir)
             .map_err(|err| format!("Unable to create config directory: {err}"))?;

@@ -42,7 +42,7 @@ impl SmartSwitcherService {
             storage: Storage::new().unwrap_or_else(|_| {
                 let fallback_path = std::env::current_dir()
                     .unwrap_or_default()
-                    .join(".smart-keyword-fallback")
+                    .join(".smart-keyboard-fallback")
                     .join("state.json");
                 Storage::from_path(fallback_path).expect("unable to initialize fallback storage")
             }),

@@ -56,7 +56,7 @@ function App() {
     void refresh();
 
     const unlisten = listen<AppOverview>(
-      "smart-keyword://overview-updated",
+      "smart-keyboard://overview-updated",
       (event) => {
         applyOverview(event.payload);
       },
@@ -178,7 +178,7 @@ function App() {
     <main className="app-shell">
       <section className="hero">
         <div>
-          <p className="eyebrow">Smart Keyword</p>
+          <p className="eyebrow">Smart Keyboard</p>
           <h1>切换应用时，让输入法自己回到对的语言。</h1>
           <p className="hero-copy">
             规则优先、学习补位，只在应用焦点切换时触发，不干扰你在应用内部手动切换中英文。

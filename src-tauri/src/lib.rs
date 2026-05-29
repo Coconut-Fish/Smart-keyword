@@ -75,7 +75,7 @@ fn learn_current_preference(state: State<'_, AppState>) -> Result<AppOverview, S
 }
 
 fn emit_overview(app: &AppHandle, overview: &AppOverview) {
-    let _ = app.emit("smart-keyword://overview-updated", overview);
+    let _ = app.emit("smart-keyboard://overview-updated", overview);
 }
 
 fn start_monitor(app: AppHandle, state: Arc<Mutex<SmartSwitcherService>>) {
