@@ -1,5 +1,4 @@
 use std::path::Path;
-use std::ptr::null_mut;
 use std::thread;
 use std::time::Duration;
 
@@ -30,7 +29,7 @@ pub struct WindowsPlatformController;
 impl WindowsPlatformController {
     fn foreground_window(&self) -> Result<HWND, String> {
         let hwnd = unsafe { GetForegroundWindow() };
-        if hwnd.0 == null_mut() {
+        if hwnd.0.is_null() {
             Err("Unable to locate a foreground window.".to_string())
         } else {
             Ok(hwnd)
@@ -80,7 +79,7 @@ impl WindowsPlatformController {
         let primary_lang = lang_id & 0x03ff;
 
         let himc = unsafe { ImmGetContext(hwnd) };
-        let ime_open = if himc.0 != null_mut() {
+        let ime_open = if !himc.0.is_null() {
             let is_open = unsafe { ImmGetOpenStatus(himc).as_bool() };
             let _ = unsafe { ImmReleaseContext(hwnd, himc) };
             is_open
@@ -126,7 +125,7 @@ impl WindowsPlatformController {
 
                 let himc = unsafe { ImmGetContext(hwnd) };
                 let mut ime_opened = false;
-                if himc.0 != null_mut() {
+                if !himc.0.is_null() {
                     ime_opened = unsafe { ImmSetOpenStatus(himc, true) }.as_bool();
                     let _ = unsafe { ImmReleaseContext(hwnd, himc) };
                 }
@@ -138,7 +137,7 @@ impl WindowsPlatformController {
             LanguageMode::English => {
                 let himc = unsafe { ImmGetContext(hwnd) };
                 let mut ime_closed = false;
-                if himc.0 != null_mut() {
+                if !himc.0.is_null() {
                     ime_closed = unsafe { ImmSetOpenStatus(himc, false) }.as_bool();
                     let _ = unsafe { ImmReleaseContext(hwnd, himc) };
                 }

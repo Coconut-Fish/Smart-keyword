@@ -22,7 +22,7 @@ pub trait PlatformController: Send + Sync {
 
 #[cfg(target_os = "windows")]
 pub fn create_controller() -> Box<dyn PlatformController> {
-    Box::new(windows::WindowsPlatformController::default())
+    Box::new(windows::WindowsPlatformController)
 }
 
 #[cfg(not(target_os = "windows"))]
