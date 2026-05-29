@@ -1,0 +1,161 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Semver tag to publish, for example v0.1.0"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark this GitHub release as a prerelease"
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  CI: true
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    name: Prepare GitHub Release
+    runs-on: ubuntu-latest
+
+    outputs:
+      tag_name: ${{ steps.release-meta.outputs.tag_name }}
+      prerelease: ${{ steps.release-meta.outputs.prerelease }}
+      release_id: ${{ steps.ensure-release.outputs.result }}
+
+    steps:
+      - name: Resolve release metadata
+        id: release-meta
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag_name=${{ inputs.release_tag }}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=${{ inputs.prerelease }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag_name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
+              echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Create or update release shell
+        id: ensure-release
+        uses: actions/github-script@v9
+        env:
+          TAG_NAME: ${{ steps.release-meta.outputs.tag_name }}
+          PRERELEASE: ${{ steps.release-meta.outputs.prerelease }}
+        with:
+          result-encoding: string
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const tag = process.env.TAG_NAME;
+            const prerelease = process.env.PRERELEASE === "true";
+
+            try {
+              const existing = await github.rest.repos.getReleaseByTag({
+                owner,
+                repo,
+                tag,
+              });
+
+              await github.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: existing.data.id,
+                name: `Smart Keyword ${tag}`,
+                draft: false,
+                prerelease,
+              });
+
+              core.notice(`Using existing release ${existing.data.id} for ${tag}.`);
+              return String(existing.data.id);
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+            }
+
+            const created = await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: tag,
+              name: `Smart Keyword ${tag}`,
+              draft: false,
+              prerelease,
+              generate_release_notes: true,
+            });
+
+            core.notice(`Created release ${created.data.id} for ${tag}.`);
+            return String(created.data.id);
+
+  build-release:
+    name: Publish Bundle (${{ matrix.os }})
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - windows-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            src-tauri -> target
+
+      - name: Install Linux build dependencies
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and upload release assets
+        uses: tauri-apps/tauri-action@v0.6.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          tagName: ${{ needs.create-release.outputs.tag_name }}
+          releaseName: Smart Keyword ${{ needs.create-release.outputs.tag_name }}
