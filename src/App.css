@@ -405,7 +405,7 @@ button {
 
 @media (max-width: 720px) {
   .app-shell {
-    width: min(100vw - 20px, 1240px);
+    width: min(calc(100vw - 20px), 1240px);
     padding: 16px 0 28px;
   }
 

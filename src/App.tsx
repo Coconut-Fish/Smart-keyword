@@ -60,10 +60,13 @@ function App() {
       (event) => {
         applyOverview(event.payload);
       },
-    );
+    ).catch((reason) => {
+      setError(asMessage(reason));
+      return null;
+    });
 
     return () => {
-      void unlisten.then((stop) => stop());
+      void unlisten.then((stop) => stop?.()).catch(() => {});
     };
   }, [applyOverview, refresh]);
 

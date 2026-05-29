@@ -80,7 +80,7 @@ fn emit_overview(app: &AppHandle, overview: &AppOverview) {
 
 fn start_monitor(app: AppHandle, state: Arc<Mutex<SmartSwitcherService>>) {
     thread::spawn(move || loop {
-        let poll_interval_ms = {
+        let (overview_to_emit, poll_interval_ms) = {
             let mut service = match state.lock() {
                 Ok(guard) => guard,
                 Err(_) => {
@@ -91,12 +91,16 @@ fn start_monitor(app: AppHandle, state: Arc<Mutex<SmartSwitcherService>>) {
 
             if service.poll_once().is_ok() {
                 let overview = service.overview();
-                emit_overview(&app, &overview);
-                overview.settings.poll_interval_ms
+                let poll_interval_ms = overview.settings.poll_interval_ms;
+                (Some(overview), poll_interval_ms)
             } else {
-                1200
+                (None, 1200)
             }
         };
+
+        if let Some(overview) = overview_to_emit {
+            emit_overview(&app, &overview);
+        }
 
         thread::sleep(Duration::from_millis(poll_interval_ms.max(400)));
     });
@@ -110,15 +114,16 @@ pub fn run() {
             let state = AppState::new();
             let handle = app.handle().clone();
 
-            {
+            let initial_overview = {
                 let mut service = state
                     .service
                     .lock()
                     .map_err(|err| std::io::Error::other(err.to_string()))?;
                 service.initialize().map_err(std::io::Error::other)?;
-                let overview = service.overview();
-                emit_overview(&handle, &overview);
-            }
+                service.overview()
+            };
+
+            emit_overview(&handle, &initial_overview);
 
             if !state.monitor_started.swap(true, Ordering::SeqCst) {
                 start_monitor(handle, Arc::clone(&state.service));

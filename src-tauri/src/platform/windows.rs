@@ -113,7 +113,7 @@ impl WindowsPlatformController {
                     .map_err(|err| format!("Unable to load Chinese keyboard layout: {err}"))?;
                 let post_message_sent = unsafe {
                     PostMessageW(
-                        hwnd,
+                        Some(hwnd),
                         WM_INPUTLANGCHANGEREQUEST,
                         WPARAM(0),
                         LPARAM(hkl.0 as isize),
@@ -146,7 +146,7 @@ impl WindowsPlatformController {
                     .map_err(|err| format!("Unable to load English keyboard layout: {err}"))?;
                 let post_message_sent = unsafe {
                     PostMessageW(
-                        hwnd,
+                        Some(hwnd),
                         WM_INPUTLANGCHANGEREQUEST,
                         WPARAM(0),
                         LPARAM(hkl.0 as isize),
